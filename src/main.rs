@@ -1,4 +1,6 @@
 use std::io::{self, BufReader, BufRead, BufWriter, Write};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 mod bot;
 mod field;
@@ -6,6 +8,8 @@ mod player;
 mod error;
 
 use error::*;
+use bot::BotState;
+use player::Player;
 
 #[derive(Debug)]
 enum Message {
@@ -79,23 +83,72 @@ fn start() -> Result<()> {
     let stdout = io::stdout();
     let stderr = io::stderr();
     let stdin = io::stdin();
+    let bot = BotState::new();
 
     for line in stdin.lock()
         .lines()
         .map(|r| r.map_err(|e| Error::IoError(e)))
         .filter_map(Result::ok) {
-            match handle_message(line) {
-                Ok(o) => writeln!(stdout.lock(), "{}", o),
+            match handle_message(line, &bot) {
+                Ok(output) => {
+                    match output {
+                        Some(o) => writeln!(stdout.lock(), "{}", o),
+                        None => Ok(())
+                    }
+                }
                 Err(e) => writeln!(stderr.lock(), "Error: {}", e),
             };
     }
     Err(Error::UnintentionalBreak)
 }
 
-fn handle_message(line: String) -> Result<String> {
+fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
     let msg = line.parse::<Message>()?;
     let reply = match msg {
-        Message::Settings(Setting::TimeBank(n)) => format!("{}", n),
+        Message::Settings(Setting::TimeBank(n)) => {
+            bot.settings.borrow_mut().time_bank = n;
+            Some(format!("set time_bank {}", n))
+        }
+        Message::Settings(Setting::TimePerMove(n)) => {
+            bot.settings.borrow_mut().time_per_move = n;
+            Some(format!("set time_per_move {}", n))
+        }
+        Message::Settings(Setting::PlayerNames(names)) => {
+            for name in names {
+                let player_name = name.clone();
+                bot.settings
+                    .borrow_mut()
+                    .players.insert(name, Player::new(player_name));
+            }
+            None
+        }
+        Message::Settings(Setting::YourBot(bot_name)) => {
+            bot.settings.borrow_mut().name = bot_name;
+            None
+        }
+        Message::Settings(Setting::YourBotId(id)) => {
+            bot.settings.borrow_mut().id = id;
+            None
+        }
+        Message::Settings(Setting::FieldWidth(w)) => {
+            bot.settings.borrow_mut().field.field.width = w as usize;
+            None
+        }
+        Message::Settings(Setting::FieldHeight(h)) => {
+            bot.settings.borrow_mut().field.field.height = h as usize;
+            None
+        }
+        Message::Settings(Setting::MaxRounds(max)) => {
+            bot.settings.borrow_mut().max_rounds = max;
+            None
+        }
+        Message::Update(Update::GameRound(n)) => {
+            bot.settings.borrow_mut().round = n;
+            None
+        }
+        Message::Update(Update::GameField(field)) => {
+            Some("not implemented".into())
+        }
         _ => return Err(Error::UnknownCommand),
     };
     Ok(reply)

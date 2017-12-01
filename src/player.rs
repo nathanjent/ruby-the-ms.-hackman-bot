@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Debug)]
 pub struct Player {
     name: String,
     bombs: i32,
@@ -25,6 +26,7 @@ impl Player {
     }
 }
 
+#[derive(Debug)]
 pub enum CharacterType {
     Bixie,
     Bixiette,
@@ -32,11 +34,13 @@ pub enum CharacterType {
 
 impl CharacterType {}
 
+#[derive(Debug)]
 pub struct Move {
     move_type: MoveType,
     bomb_ticks: i32,
 }
 
+#[derive(Debug)]
 pub enum MoveType {
     Up,
     Down,

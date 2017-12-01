@@ -1,32 +1,36 @@
 use std::ops::{Index, IndexMut};
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub struct Field {
-    player_id: String,
-    opponent_id: String,
-    field: Matrix<Location>,
-    player_position: Option<Point>,
-    opponent_position: Option<Point>,
-    enemy_positions: Vec<Point>,
-    snippet_positions: Vec<Point>,
-    bomb_positions: Vec<Point>,
-    ticking_bomb_positions: Vec<Point>,
+    pub player_id: String,
+    pub opponent_id: String,
+    pub field: Matrix<Location>,
+    pub player_position: Option<Point>,
+    pub opponent_position: Option<Point>,
+    pub enemy_positions: Vec<Point>,
+    pub snippet_positions: Vec<Point>,
+    pub bomb_positions: Vec<Point>,
+    pub ticking_bomb_positions: Vec<Point>,
 }
 
+#[derive(Debug)]
 pub struct FieldUpdate {}
 
+#[derive(Debug)]
 pub struct Matrix<T> {
-    m: Vec<T>,
-    width: usize,
-    height: usize,
+    pub m: Vec<T>,
+    pub width: usize,
+    pub height: usize,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Location {
     Empty,
     Blocked,
 }
 
+#[derive(Debug)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -84,6 +88,7 @@ impl Field {
     }
 }
 
+#[derive(Debug)]
 pub enum FieldCell {
     Player(i32),
     Spawn,
@@ -92,6 +97,7 @@ pub enum FieldCell {
     CodeSnippet,
 }
 
+#[derive(Debug)]
 pub enum EnemyType {
 }
 
