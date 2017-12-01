@@ -46,7 +46,8 @@ impl<T> Matrix<T> {
     }
 
     pub fn reset_to(&mut self, value: T)
-        where T: Copy
+    where
+        T: Copy,
     {
         for v in self.m.iter_mut() {
             *v = value;

@@ -7,6 +7,7 @@ use std::cell::RefCell;
 #[derive(Debug)]
 pub struct BotState {
     pub settings: Rc<RefCell<Settings>>,
+    pub player: Rc<RefCell<Player>>,
 }
 
 #[derive(Debug)]
@@ -35,7 +36,8 @@ impl BotState {
                 max_rounds: 0,
                 opponent_name: String::new(),
                 field: Field::new(1, 1),
-            }))
+            })),
+            player: Rc::new(RefCell::new(Player::new("".into()))),
         }
     }
 }

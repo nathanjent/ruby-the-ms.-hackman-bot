@@ -1,6 +1,10 @@
 [package]
 name = "ruby_the_ms_hack_man_bot"
 version = "0.1.0"
-authors = ["nathanjent <nathanjent@gmail.com>"]
+authors = ["Nathan Jent <nathanjent@gmail.com>"]
 
 [dependencies]
+futures = "0.1.17"
+tokio-core = "0.1.10"
+tokio-file-unix = "0.4.1"
+tokio-io = "0.1.4"

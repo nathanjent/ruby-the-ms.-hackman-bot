@@ -2,10 +2,11 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct Player {
-    name: String,
-    bombs: i32,
-    snippets: i32,
-    character: CharacterType,
+    pub name: String,
+    pub bombs: i32,
+    pub snippets: i32,
+    pub character: CharacterType,
+    pub bomb_drop: Option<i32>,
 }
 
 impl Player {
@@ -15,6 +16,7 @@ impl Player {
             bombs: 0,
             snippets: 0,
             character: CharacterType::Bixie,
+            bomb_drop: None,
         }
     }
 
