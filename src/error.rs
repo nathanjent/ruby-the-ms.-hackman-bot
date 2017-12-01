@@ -8,6 +8,8 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 pub enum Error {
     IoError(IoError),
     ParseError(ParseErrorKind),
+    UnintentionalBreak,
+    UnknownCommand,
 }
 
 #[derive(Debug)]
@@ -29,6 +31,8 @@ impl StdError for Error {
         match *self {
             Error::IoError(_) => "io error",
             Error::ParseError(_) => "parse error",
+            Error::UnintentionalBreak => "application ended unexpectedly",
+            Error::UnknownCommand => "Command is not supported",
         }
     }
 
@@ -44,6 +48,8 @@ impl fmt::Display for Error {
         match *self {
             Error::IoError(ref msg) => write!(fmt, "IO error {}", msg),
             Error::ParseError(ref msg) => write!(fmt, "Parse error {:?}", msg),
+            Error::UnintentionalBreak => write!(fmt, "Application ended unexpectedly"),
+            Error::UnknownCommand => write!(fmt, "Command is not supported"),
         }
     }
 }

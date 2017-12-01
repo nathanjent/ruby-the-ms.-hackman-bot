@@ -1,4 +1,4 @@
-use std::io::{self, BufReader, BufRead, BufWriter};
+use std::io::{self, BufReader, BufRead, BufWriter, Write};
 
 mod bot;
 mod field;
@@ -7,12 +7,14 @@ mod error;
 
 use error::*;
 
+#[derive(Debug)]
 enum Message {
     Settings(Setting),
     Update(Update),
     Action(Action),
 }
 
+#[derive(Debug)]
 enum Setting {
     TimeBank(i32),
     TimePerMove(i32),
@@ -24,6 +26,7 @@ enum Setting {
     MaxRounds(i32),
 }
 
+#[derive(Debug)]
 enum Update {
     GameRound(i32),
     GameField(Vec<Cell>),
@@ -31,15 +34,18 @@ enum Update {
     PlayerBombs(i32),
 }
 
+#[derive(Debug)]
 enum Action {
     Character { time_to_respond: i32 },
     Move { time_to_respond: i32 },
 }
 
+#[derive(Debug)]
 pub struct Cell {
     cell_items: Vec<CellItem>,
 }
 
+#[derive(Debug)]
 pub enum CellItem {
     Empty,
     Inaccessible,
@@ -51,6 +57,7 @@ pub enum CellItem {
     CodeSnippet,
 }
 
+#[derive(Debug)]
 pub enum GateDirection {
     Left,
     Right,
@@ -69,16 +76,29 @@ fn main() {
 }
 
 fn start() -> Result<()> {
-    let output = BufWriter::new(io::stdout());
-    let err = BufWriter::new(io::stderr());
+    let stdout = io::stdout();
+    let stderr = io::stderr();
+    let stdin = io::stdin();
 
-    for line in BufReader::new(io::stdin())
+    for line in stdin.lock()
         .lines()
         .map(|r| r.map_err(|e| Error::IoError(e)))
         .filter_map(Result::ok) {
-        let msg = line.parse::<Message>()?;
+            match handle_message(line) {
+                Ok(o) => writeln!(stdout.lock(), "{}", o),
+                Err(e) => writeln!(stderr.lock(), "Error: {}", e),
+            };
     }
-    Ok(())
+    Err(Error::UnintentionalBreak)
+}
+
+fn handle_message(line: String) -> Result<String> {
+    let msg = line.parse::<Message>()?;
+    let reply = match msg {
+        Message::Settings(Setting::TimeBank(n)) => format!("{}", n),
+        _ => return Err(Error::UnknownCommand),
+    };
+    Ok(reply)
 }
 
 impl std::str::FromStr for Message {
