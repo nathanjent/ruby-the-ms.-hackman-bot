@@ -10,18 +10,15 @@ type BoxAny = Box<Any + Send>;
 pub enum Error {
     IoError(IoError),
     ParseError(ParseErrorKind),
-    UnintentionalBreak,
-    UnknownCommand,
     UnknownError(BoxAny),
 }
 
 #[derive(Debug)]
 pub enum ParseErrorKind {
     UnknownCommand,
-    Eof,
     Incomplete,
-    InvalidOption,
-    NumberFormat,
+    InvalidCellType,
+    NumberFormat(BoxAny),
 }
 
 impl From<BoxAny> for Error {
@@ -42,8 +39,6 @@ impl StdError for Error {
             Error::IoError(_) => "io error",
             Error::ParseError(_) => "parse error",
             Error::UnknownError(_) => "unknown error",
-            Error::UnintentionalBreak => "application ended unexpectedly",
-            Error::UnknownCommand => "Command is not supported",
         }
     }
 
@@ -58,10 +53,9 @@ impl fmt::Display for ParseErrorKind {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             ParseErrorKind::UnknownCommand => write!(fmt, "Unknown command"),
-            ParseErrorKind::Eof => write!(fmt, "End of file"),
             ParseErrorKind::Incomplete => write!(fmt, "Incomplete command"),
-            ParseErrorKind::InvalidOption => write!(fmt, "Invalid command option"),
-            ParseErrorKind::NumberFormat => write!(fmt, "Could not parse as a number"),
+            ParseErrorKind::InvalidCellType => write!(fmt, "Invalid field cell type"),
+            ParseErrorKind::NumberFormat(ref e) => write!(fmt, "Could not parse value {:?}", e),
         }
     }
 }
@@ -72,8 +66,6 @@ impl fmt::Display for Error {
             Error::IoError(ref msg) => write!(fmt, "IO error {}", msg),
             Error::ParseError(ref msg) => write!(fmt, "Parse error {}", msg),
             Error::UnknownError(ref msg) => write!(fmt, "Unknown error {:?}", msg),
-            Error::UnintentionalBreak => write!(fmt, "Application ended unexpectedly"),
-            Error::UnknownCommand => write!(fmt, "Command is not supported"),
         }
     }
 }
