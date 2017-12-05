@@ -11,6 +11,7 @@ pub enum Error {
     IoError(IoError),
     ParseError(ParseErrorKind),
     UnknownError(BoxAny),
+    UnintentionalBreak,
 }
 
 #[derive(Debug)]
@@ -39,6 +40,7 @@ impl StdError for Error {
             Error::IoError(_) => "io error",
             Error::ParseError(_) => "parse error",
             Error::UnknownError(_) => "unknown error",
+            Error::UnintentionalBreak => "unintentional break error",
         }
     }
 
@@ -66,6 +68,7 @@ impl fmt::Display for Error {
             Error::IoError(ref msg) => write!(fmt, "IO error {}", msg),
             Error::ParseError(ref msg) => write!(fmt, "Parse error {}", msg),
             Error::UnknownError(ref msg) => write!(fmt, "Unknown error {:?}", msg),
+            Error::UnintentionalBreak => write!(fmt, "Unintentional break error"),
         }
     }
 }

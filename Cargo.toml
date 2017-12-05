@@ -3,7 +3,13 @@ name = "ruby_the_ms_hack_man_bot"
 version = "0.1.0"
 authors = ["Nathan Jent <nathanjent@gmail.com>"]
 
+# Ms. Hackman has these crates available
 [dependencies]
+rand = "0.3.15"
+libc = "0.2.28"
+
+# Ms. Hackman does not support downloading
+[target.'cfg(external)'.dependencies]
 futures = "0.1.17"
 tokio-core = "0.1.10"
 tokio-file-unix = "0.4.1"

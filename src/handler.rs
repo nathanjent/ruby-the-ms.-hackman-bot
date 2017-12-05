@@ -80,9 +80,13 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
         Message::Action(Action::Move { time_to_respond: n }) => {
             let player_map = bot.players.borrow();
             let ref player_name = bot.settings.borrow().name;
+            
+            // TODO this is where decisions need to be made
             let mut action = Some("up".into());
+
             if let Some(player) = player_map.get(player_name) {
                 if let Some(detonation_time) = player.bomb_drop {
+                    // TODO maybe don't drop the bomb as soon as you get it
                     action = Some(format!("up;drop_bomb {}", detonation_time));
                 } 
             }

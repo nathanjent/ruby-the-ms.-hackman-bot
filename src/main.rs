@@ -1,12 +1,12 @@
-extern crate futures;
-extern crate tokio_core;
-extern crate tokio_io;
-extern crate tokio_file_unix;
-
-use futures::Stream;
-use tokio_io::io;
-use tokio_file_unix::{File, StdFile};
-use std::io::{self as stdio, Write};
+#[cfg(external)] extern crate futures;
+#[cfg(external)] extern crate tokio_core;
+#[cfg(external)] extern crate tokio_io;
+#[cfg(external)] extern crate tokio_file_unix;
+ 
+#[cfg(external)] use futures::Stream;
+#[cfg(external)] use tokio_io::io;
+#[cfg(external)] use tokio_file_unix::{File, StdFile};
+use std::io::{self as stdio, BufRead, Write};
 
 mod bot;
 mod error;
@@ -32,6 +32,36 @@ fn main() {
     ::std::process::exit(status);
 }
 
+/// Run the event loop
+#[cfg(not(test))]
+fn start() -> Result<()> {
+    let stdin = stdio::stdin();
+    let stdout = stdio::stdout();
+    let stderr = stdio::stderr();
+    let mut writer = stdout.lock();
+    let mut err = stderr.lock();
+    
+    // initialize the game state
+    let bot = BotState::new();
+
+    for line in stdin.lock().lines() {
+        if let Ok(line) = line {
+            match handle_message(line, &bot) {
+                Ok(output) => {
+                    match output {
+                        Some(o) => writeln!(writer, "{}", o)?,
+                        None => {},
+                    }
+                }
+                Err(e) => writeln!(err, "Error: {}", e)?,
+            }
+        }
+    }
+    Err(Error::UnintentionalBreak)
+}
+
+// No external lib support.
+#[cfg(external)]
 #[cfg(not(test))]
 fn start() -> Result<()> {
     // initialize the event loop
