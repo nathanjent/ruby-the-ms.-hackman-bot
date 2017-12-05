@@ -18,9 +18,8 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
         Message::Settings(Setting::PlayerNames(names)) => {
             for name in names {
                 let player_name = name.clone();
-                bot.settings
+                bot.players
                     .borrow_mut()
-                    .players
                     .insert(name, Player::new(player_name));
             }
             None
@@ -61,21 +60,33 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
             None
         }
         Message::Update(Update::PlayerSnippets(player, n)) => {
-            //TODO use map for player
-            bot.player.borrow_mut().snippets = n;
+            let mut player_map = bot.players.borrow_mut();
+            if let Some(player) = player_map.get_mut(&player) {
+                player.snippets = n;
+            }
             None
         }
         Message::Update(Update::PlayerBombs(player, n)) => {
-            bot.player.borrow_mut().bombs = n;
+            let mut player_map = bot.players.borrow_mut();
+            if let Some(player) = player_map.get_mut(&player) {
+                player.bombs = n;
+            }
             None
         }
-        Message::Action(Action::Character { time_to_respond: n }) => Some("bixie".into()),
+        Message::Action(Action::Character { time_to_respond: n }) => {
+            // TODO allow character choice configuration
+            Some("bixie".into())
+        }
         Message::Action(Action::Move { time_to_respond: n }) => {
-            if let Some(detonation_time) = bot.player.borrow().bomb_drop {
-                Some(format!("up;drop_bomb {}", detonation_time))
-            } else {
-                Some("up".into())
+            let player_map = bot.players.borrow();
+            let ref player_name = bot.settings.borrow().name;
+            let mut action = Some("up".into());
+            if let Some(player) = player_map.get(player_name) {
+                if let Some(detonation_time) = player.bomb_drop {
+                    action = Some(format!("up;drop_bomb {}", detonation_time));
+                } 
             }
+            action
         }
     };
     Ok(reply)
