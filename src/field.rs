@@ -3,8 +3,8 @@ use error::{Error, ParseErrorKind, Result};
 
 #[derive(Debug)]
 pub struct Field {
-    pub player_id: String,
-    pub opponent_id: String,
+    pub player_id: i32,
+    pub opponent_id: i32,
     pub field: Matrix<Cell>,
     pub player_position: Option<Point>,
     pub opponent_position: Option<Point>,
@@ -45,17 +45,17 @@ pub enum AiType {
     FarChase,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
-    pub x: i32,
-    pub y: i32,
+    pub x: usize,
+    pub y: usize,
 }
 
 impl Field {
     pub fn new(width: usize, height: usize) -> Self {
         Field {
-            player_id: String::new(),
-            opponent_id: String::new(),
+            player_id: 0,
+            opponent_id: 1,
             field: Matrix::new(width, height),
             player_position: None,
             opponent_position: None,
@@ -66,8 +66,41 @@ impl Field {
         }
     }
 
+    /// Get the coordinate point for the given index.
+    fn get_point(&self, index: usize) -> Point {
+        let (x, y) = self.field.position(index);
+        Point { x, y }
+    }
+
     pub fn update_field(&mut self, field: Vec<Cell>) {
         // TODO update other Field values, too
+        for (i, cell) in field.iter().enumerate() {
+            let point = self.get_point(i);
+            for item in &cell.cell_items {
+                match *item {
+                    CellItem::Player(id) => {
+                        if id == self.player_id {
+                            self.player_position = Some(point);
+                        }
+                        if id == self.opponent_id {
+                            self.opponent_position = Some(point);
+                        }
+                    }
+                    CellItem::Enemy(enemy) => {
+                        self.enemy_positions.push(point);
+                    }
+                    CellItem::Bomb(n) => {
+                        self.bomb_positions.push(point);
+                        self.ticking_bomb_positions.push(point);
+                    }
+                    CellItem::CodeSnippet => {
+                        self.snippet_positions.push(point);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
         self.field.m = field;
     }
 

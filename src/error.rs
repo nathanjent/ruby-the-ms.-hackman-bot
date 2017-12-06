@@ -12,6 +12,7 @@ pub enum Error {
     ParseError(ParseErrorKind),
     UnknownError(BoxAny),
     UnintentionalBreak,
+    PlayerNotFound(String),
 }
 
 #[derive(Debug)]
@@ -41,6 +42,7 @@ impl StdError for Error {
             Error::ParseError(_) => "parse error",
             Error::UnknownError(_) => "unknown error",
             Error::UnintentionalBreak => "unintentional break error",
+            Error::PlayerNotFound(_) => "player not found error",
         }
     }
 
@@ -69,6 +71,7 @@ impl fmt::Display for Error {
             Error::ParseError(ref msg) => write!(fmt, "Parse error {}", msg),
             Error::UnknownError(ref msg) => write!(fmt, "Unknown error {:?}", msg),
             Error::UnintentionalBreak => write!(fmt, "Unintentional break error"),
+            Error::PlayerNotFound(ref name) => write!(fmt, "Player not found error {}", name),
         }
     }
 }

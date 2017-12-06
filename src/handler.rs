@@ -1,9 +1,11 @@
+//! Where the magic happens
 use error::*;
 use bot::BotState;
 use field::*;
 use player::*;
 use message::*;
 
+/// Process incoming messages to update game state.
 pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
     let msg = line.parse::<Message>()?;
     let reply = match msg {
@@ -64,6 +66,8 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
             let mut player_map = bot.players.borrow_mut();
             if let Some(player) = player_map.get_mut(&player) {
                 player.snippets = n;
+            } else {
+                return Err(Error::PlayerNotFound(player))
             }
             None
         }
@@ -71,6 +75,8 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
             let mut player_map = bot.players.borrow_mut();
             if let Some(player) = player_map.get_mut(&player) {
                 player.bombs = n;
+            } else {
+                return Err(Error::PlayerNotFound(player))
             }
             None
         }
@@ -95,6 +101,8 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
                     // TODO maybe don't drop the bomb as soon as you get it
                     action = format!("{};drop_bomb {}", action, detonation_time);
                 } 
+            } else {
+                return Err(Error::PlayerNotFound(player_name.clone()))
             }
             Some(action)
         }
