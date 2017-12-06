@@ -67,6 +67,7 @@ impl Field {
     }
 
     pub fn update_field(&mut self, field: Vec<Cell>) {
+        // TODO update other Field values, too
         self.field.m = field;
     }
 

@@ -60,6 +60,11 @@ impl Move {
     }
 }
 
+pub fn make_move() -> Move {
+    let mut next_move = Move::new();
+    next_move
+}
+
 impl fmt::Display for Move {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let move_type = match self.move_type {

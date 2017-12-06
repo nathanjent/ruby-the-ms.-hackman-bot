@@ -1,8 +1,9 @@
-use player::Player;
-use field::Field;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
+
+use field::Field;
+use player::Player;
 
 #[derive(Debug)]
 pub struct BotState {

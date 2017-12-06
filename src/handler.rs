@@ -1,6 +1,7 @@
 use error::*;
 use bot::BotState;
-use player::Player;
+use field::*;
+use player::*;
 use message::*;
 
 pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
@@ -78,20 +79,31 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
             Some("bixie".into())
         }
         Message::Action(Action::Move { time_to_respond: n }) => {
+            let ref field = bot.field.borrow();
             let player_map = bot.players.borrow();
-            let ref player_name = bot.settings.borrow().name;
+            let settings = bot.settings.borrow();
+            let ref player_name = settings.name;
+            let ref player_id = settings.id;
             
-            // TODO this is where decisions need to be made
-            let mut action = Some("up".into());
+            let mut action = String::new();
 
             if let Some(player) = player_map.get(player_name) {
+                // TODO this is where decisions need to be made
+                action = make_move(field, player_id).to_string();
+
                 if let Some(detonation_time) = player.bomb_drop {
                     // TODO maybe don't drop the bomb as soon as you get it
-                    action = Some(format!("up;drop_bomb {}", detonation_time));
+                    action = format!("{};drop_bomb {}", action, detonation_time);
                 } 
             }
-            action
+            Some(action)
         }
     };
     Ok(reply)
+}
+
+/// Decide the next move
+fn make_move(field: &Field, player_id: &i32) -> Move {
+    let mut next_move = Move::new();
+    next_move
 }
