@@ -38,8 +38,8 @@ impl CharacterType {}
 
 #[derive(Debug)]
 pub struct Move {
-    move_type: MoveType,
-    bomb_ticks: i32,
+    pub move_type: MoveType,
+    pub bomb_ticks: i32,
 }
 
 #[derive(Debug)]

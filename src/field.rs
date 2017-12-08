@@ -170,8 +170,9 @@ impl ::std::str::FromStr for CellItem {
             ("E", "1") => Ok(CellItem::Enemy(AiType::Predict)),
             ("E", "2") => Ok(CellItem::Enemy(AiType::Lever)),
             ("E", "3") => Ok(CellItem::Enemy(AiType::FarChase)),
+            ("B", "") => Ok(CellItem::Bomb(-1)),
             ("B", v) => {
-                // Bomb<rounds_until>
+                // Bomb<rounds_until_detonate>
                 match v.parse::<i32>() {
                     Ok(n) => Ok(CellItem::Bomb(n)),
                     Err(e) => Err(Error::ParseError(ParseErrorKind::NumberFormat(Box::new(e)))),

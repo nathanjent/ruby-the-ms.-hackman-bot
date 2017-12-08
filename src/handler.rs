@@ -34,7 +34,10 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
         }
         Message::Settings(Setting::YourBotId(id)) => {
             let mut settings = bot.settings.borrow_mut();
+            let mut field = bot.field.borrow_mut();
             settings.id = id;
+            field.player_id = id;
+            field.opponent_id = id + 1;
             None
         }
         Message::Settings(Setting::FieldWidth(w)) => {
@@ -113,5 +116,28 @@ pub fn handle_message(line: String, bot: &BotState) -> Result<Option<String>> {
 /// Decide the next move
 fn make_move(field: &Field, player_id: &i32) -> Move {
     let mut next_move = Move::new();
+    let my_pos = &field.player_position;
+    let op_pos = &field.opponent_position;
+    let en_pos = &field.enemy_positions;
+    let bm_pos = &field.bomb_positions;
+    let sn_pos = &field.snippet_positions;
+
+    // TODO don't walk into walls
+    // TODO avoid enemies & ticking bombs
+    // TODO collect snippets and new bombs
+    
+    // Arbitrary position update
+    if let &Some(p) = my_pos {
+        if let &Some(o) = op_pos {
+            next_move.move_type = match  p.x % o.x {
+                0 => MoveType::Up,
+                1 => MoveType::Down,
+                2 => MoveType::Left,
+                3 => MoveType::Right,
+                _ => MoveType::Pass,
+            };
+        }
+    }
+
     next_move
 }
